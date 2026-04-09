@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sitemap Extractor</title>
+</head>
+<body>
+
+<h2>Fetch Sitemap for Pre-configured Website</h2>
+
+<form method="post" action="/fetch">
+    <button type="submit">Fetch URLs</button>
+</form>
+
+<hr>
+
+{% if error %}
+    <p style="color:red;">Error: {{ error }}</p>
+{% endif %}
+
+{% if urls %}
+    <h3>Fetched URLs:</h3>
+    <ul>
+        {% for url in urls %}
+            <li>{{ url }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+</body>
+</html>
