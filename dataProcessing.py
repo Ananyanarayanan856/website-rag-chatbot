@@ -41,6 +41,14 @@ def process_scraped_data(json_file_path, db_directory="./website_db"):
     if len(documents) == 0:
         print("ERROR: No documents processed. Something is wrong with the JSON structure.")
         return
-
+ 
+    print("Chunking the text...")
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1000,
+        chunk_overlap=200,
+        length_function=len
+    )
+    chunks = text_splitter.split_documents(documents)
+    print(f"Created {len(chunks)} text chunks.")
 
  
