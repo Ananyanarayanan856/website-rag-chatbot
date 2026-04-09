@@ -51,4 +51,19 @@ def process_scraped_data(json_file_path, db_directory="./website_db"):
     chunks = text_splitter.split_documents(documents)
     print(f"Created {len(chunks)} text chunks.")
 
+    print("Downloading/Loading embedding model...")
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    
+    print("Embedding chunks and saving to vector database...")
+    vector_store = Chroma.from_documents(
+        documents=chunks,
+        embedding=embeddings,
+        persist_directory=db_directory 
+    )
+
+    print(f"Success! Vector database saved locally at: {db_directory}")
+
+if __name__ == "__main__":
+    process_scraped_data('scraped_data.json')
+
  
