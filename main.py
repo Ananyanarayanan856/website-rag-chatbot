@@ -37,10 +37,7 @@ def fetch_urls(request: Request):
             # Saving as JSON array
             with open("sitemap_urls.json", "w", encoding="utf-8") as f:
                 json.dump(result["urls"], f, indent=4)
-            # Saving as a Python variable (array) in a .py file
-            with open("sitemap_data.py", "w", encoding="utf-8") as f:
-                f.write(f"SITEMAP_URLS = {json.dumps(result['urls'], indent=4)}\n")
-
+            
     return templates.TemplateResponse(
         request=request,
         name="index.html",
