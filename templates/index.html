@@ -1,30 +1,278 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sitemap Extractor</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Website Chatbot</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+        :root {
+            --bg: #0f111a;
+            --surface: #1e2130;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --text-main: #f8f9fa;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --user-bubble: #6366f1;
+            --bot-bubble: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            width: 100vw;
+        }
+
+        .chat-header {
+            padding: 24px 36px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(15, 17, 26, 0.7);
+            backdrop-filter: blur(12px);
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .chat-window {
+            flex: 1;
+            padding: 36px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            scroll-behavior: smooth;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        .message-bubble {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.01em;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .user-msg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .bot-msg {
+            background: var(--bot-bubble);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            white-space: pre-wrap;
+            color: #e2e8f0;
+        }
+
+        .input-area {
+            padding: 24px 36px;
+            background: rgba(15, 17, 26, 0.8);
+            border-top: 1px solid var(--border);
+            backdrop-filter: blur(12px);
+        }
+
+        .input-container {
+            display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 10px 16px;
+            gap: 12px;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-container:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .input-container input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 6px;
+            font-size: 1rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .input-container input::placeholder { color: var(--text-muted); }
+
+        .send-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .send-btn:hover {
+            background: var(--primary-hover);
+            transform: scale(1.08);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .send-btn:active { transform: scale(0.95); }
+        .send-btn svg { width: 18px; height: 18px; fill: currentColor; margin-left: 2px; }
+
+        .typing-container { align-self: flex-start; display: none; }
+        .typing-container.active { display: block; }
+        .typing-indicator {
+            display: inline-flex; gap: 6px; padding: 18px 24px;
+            background: var(--bot-bubble); border: 1px solid var(--border);
+            border-radius: 16px; border-bottom-left-radius: 4px;
+        }
+
+        .dot {
+            width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; background: var(--text-main); }
+        }
+    </style>
 </head>
+
 <body>
 
-<h2>Fetch Sitemap for Pre-configured Website</h2>
+    <div class="main-chat">
+        <div class="chat-header">
+            <div class="status-dot"></div>
+            Website Assistant AI
+        </div>
 
-<form method="post" action="/fetch">
-    <button type="submit">Fetch URLs</button>
-</form>
+        <div class="chat-window" id="chat-window">
+            <div class="message-bubble bot-msg">Hello! I'm your AI RAG assistant. I've ingested your website's data and am ready to answer any questions about the content. What would you like to know?</div>
+        </div>
 
-<hr>
+        <div class="typing-container" id="loader">
+            <div class="typing-indicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
 
-{% if error %}
-    <p style="color:red;">Error: {{ error }}</p>
-{% endif %}
+        <div class="input-area">
+            <div class="input-container">
+                <input type="text" id="chat-input" placeholder="Ask anything about the website data..."
+                    onkeydown="if(event.key === 'Enter') sendMessage()" autocomplete="off" />
+                <button class="send-btn" onclick="sendMessage()" title="Send Message">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
-{% if urls %}
-    <h3>Fetched URLs:</h3>
-    <ul>
-        {% for url in urls %}
-            <li>{{ url }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const chatInput = document.getElementById('chat-input');
+        const loader = document.getElementById('loader');
 
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Add user bubble
+            appendMessage(text, 'user-msg');
+            chatInput.value = '';
+
+            // Show Loader
+            chatWindow.appendChild(loader);
+            loader.classList.add('active');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            try {
+                // Call /chat API defined in app.py
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: text })
+                });
+                
+                const data = await response.json();
+                
+                // Hide Loader
+                loader.classList.remove('active');
+
+                if(data.error) {
+                    appendMessage("Error: " + data.error, 'bot-msg');
+                } else {
+                    appendMessage(data.answer, 'bot-msg');
+                }
+
+            } catch (error) {
+                loader.classList.remove('active');
+                appendMessage("Error reaching the assistant. Ensure the backend is running and data is loaded.", 'bot-msg');
+            }
+        }
+
+        function appendMessage(text, className) {
+            const div = document.createElement('div');
+            div.className = `message-bubble ${className}`;
+            div.innerText = text;
+            chatWindow.appendChild(div);
+            // Re-append loader to ensure it stays at the bottom during activity
+            if (loader.classList.contains('active')) {
+                chatWindow.appendChild(loader);
+            }
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    </script>
 </body>
 </html>
