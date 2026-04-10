@@ -1,87 +1,91 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+import os
+import uvicorn
+from dotenv import load_dotenv
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from langchain_chroma import Chroma
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
+from langchain_groq import ChatGroq
 
-from sitemap_extractor import extract_urls
-from chatbot import chat  # ✅ Added chatbot import
-
-import os
-from dotenv import load_dotenv
 
 load_dotenv()
+hf_token = os.getenv("HF_TOKEN")
+groq_api_key = os.getenv("GROQ_API_KEY")
 
-app = FastAPI()
+if not hf_token:
+    raise ValueError("HF_TOKEN not found!")
+if not groq_api_key:
+    raise ValueError("GROQ_API_KEY not found!")
+
+DB_DIRECTORY = "./website_db"
+
+print("Loading Database and Embeddings...")
+embedding = HuggingFaceEndpointEmbeddings(
+    model="sentence-transformers/all-MiniLM-L6-v2",
+    huggingfacehub_api_token=hf_token
+)
+
+db = Chroma(
+    persist_directory=DB_DIRECTORY,
+    embedding_function=embedding
+)
+
+print("Connecting to Groq API...")
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=groq_api_key,
+    temperature=0.3 
+)
+
+def retrieve_context(query: str, k: int = 3) -> str:
+    docs = db.similarity_search(query, k=k)
+    return "\n\n".join([doc.page_content for doc in docs])
+
+def generate_answer(query: str, context: str) -> str:
+    prompt = f"""
+    Answer the question ONLY using the provided context.
+    If the answer is not in the context, say "I can help you with company related informations. Thank You!".
+    
+    Context:
+    {context}
+    
+    Question:
+    {query}
+    """
+    
+    result = llm.invoke(prompt)
+    return result.content
+
+
+app = FastAPI(title="AI Website Chatbot API")
+
+
 templates = Jinja2Templates(directory="templates")
 
 
-# -------------------------------
-# Home Route
-# -------------------------------
-@app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={"request": request}
-    )
-
-
-# -------------------------------
-# Sitemap Fetch Route
-# -------------------------------
-@app.post("/fetch", response_class=HTMLResponse)
-def fetch_urls(request: Request):
-    load_dotenv(override=True)
-    website_url = os.getenv("WEBSITE_URL")
-
-    if not website_url:
-        result = {"urls": [], "error": "WEBSITE_URL is not set in .env file"}
-    else:
-        result = extract_urls(website_url)
-
-        # Save extracted URLs
-        if result.get("urls"):
-            import json
-            with open("sitemap_urls.json", "w", encoding="utf-8") as f:
-                json.dump(result["urls"], f, indent=4)
-
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request,
-            "urls": result.get("urls", []),
-            "error": result.get("error")
-        }
-    )
-
-
-# -------------------------------
-# Chat API (JSON)
-# -------------------------------
 class ChatRequest(BaseModel):
     query: str
 
+@app.get("/")
+async def home(request: Request):
+ 
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/chat")
-def chatbot_api(request: ChatRequest):
-    answer = chat(request.query)
+async def chat_endpoint(request_data: ChatRequest):
+    user_query = request_data.query.strip()
+    
+    if not user_query:
+        raise HTTPException(status_code=400, detail="No query provided")
+
+    print(f"\nUser: {user_query}")
+    context = retrieve_context(user_query)
+    answer = generate_answer(user_query, context)
+    print(f"Bot: {answer}\n")
+    
     return {"answer": answer}
 
-
-# -------------------------------
-# Chat UI (Form-based)
-# -------------------------------
-@app.post("/ask", response_class=HTMLResponse)
-def ask_question(request: Request, query: str = Form(...)):
-    answer = chat(query)
-
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={
-            "request": request,
-            "answer": answer
-        }
-    )
+if __name__ == "__main__":
+    print("Starting FastAPI server...")
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
