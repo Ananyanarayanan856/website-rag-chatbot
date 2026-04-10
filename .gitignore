@@ -9,4 +9,5 @@ __pycache__/
 #env file
 .env
 
-
+#chroma db
+website_db/
