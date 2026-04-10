@@ -73,7 +73,7 @@ website-rag-chatbot/
 ### 1. Clone the Repository
 
 ```bash
-git clone <https://github.com/Ananyanarayanan856/website-rag-chatbot.git >
+git clone https://github.com/Ananyanarayanan856/website-rag-chatbot.git
 cd website-rag-chatbot
 ```
 
