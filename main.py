@@ -3,6 +3,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
@@ -59,6 +60,7 @@ def generate_answer(query: str, context: str) -> str:
 
 
 app = FastAPI(title="AI Website Chatbot API")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 templates = Jinja2Templates(directory="templates")
