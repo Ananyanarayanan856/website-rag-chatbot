@@ -60,6 +60,7 @@ def chat(query: str) -> str:
 
 #  Test
 if __name__ == "__main__":
-    test_question = "What is your name"
-    response = chat(test_question)
-    print(f"\nBot: {response}\n")
+    while 1:
+        test_question=input("Enter the question: ")
+        response = chat(test_question)
+        print(f"\nBot: {response}\n")
