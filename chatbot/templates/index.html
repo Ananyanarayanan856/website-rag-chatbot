@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Website Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+
+<body>
+
+    <div class="main-chat">
+        <div class="chat-header">
+            <div class="status-dot"></div>
+            Website Assistant AI
+        </div>
+
+        <div class="chat-window" id="chat-window">
+            <div class="message-bubble bot-msg">Hello! I'm your AI RAG assistant. I've ingested your website's data and am ready to answer any questions about the content. What would you like to know?</div>
+        </div>
+
+        <div class="typing-container" id="loader">
+            <div class="typing-indicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-container">
+                <input type="text" id="chat-input" placeholder="Ask anything about the website data..."
+                    onkeydown="if(event.key === 'Enter') sendMessage()" autocomplete="off" />
+                <button class="send-btn" onclick="sendMessage()" title="Send Message">
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', path='script.js') }}"></script>
+</body>
+</html>
