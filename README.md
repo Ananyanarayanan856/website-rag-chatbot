@@ -1,86 +1,136 @@
-Website RAG Chatbot
-Description
+# 🤖 Website RAG Chatbot
 
-What it does: A production-ready AI chatbot designed to interact with users using context retrieved directly from a website's content.
+> A production-ready AI chatbot designed to interact with users using context retrieved directly from a website's content.
 
-Problem it solves: Prevents hallucination by grounding large language model (LLM) responses via accurate web scraping and vector search, ensuring users receive trustworthy, domain-specific information.
+## 📖 Overview
 
-Key Idea: RAG-based chatbot for websites utilizing a dedicated scraping pipeline and local vector database.
+The Website RAG Chatbot prevents large language model (LLM) hallucinations by grounding responses via accurate web scraping and vector search. By utilizing a dedicated scraping pipeline and a local vector database, it ensures users receive trustworthy, domain-specific information directly from the source.
 
-Features
-Chatbot interaction with a clean, responsive web-based interface
-Website scraping and sitemap extraction pipeline
-Retrieval-Augmented Generation (RAG) for accurate responses
-FastAPI backend for high-performance APIs
-ChromaDB vector database for similarity search
-Tech Stack
-Backend: Python, FastAPI, Uvicorn
-AI/LLM: LangChain, Groq API, HuggingFace
-Vector Database: ChromaDB
-Frontend: HTML, CSS, JavaScript
-Data Scraping: BeautifulSoup and custom Python scripts
+**Key Idea:** A Retrieval-Augmented Generation (RAG) chatbot utilizing a dedicated data ingestion pipeline and a robust local vector database.
 
+---
+
+## ✨ Features
+
+- **Clean Web Interface:** A responsive and intuitive chat interface for seamless user interaction.
+- **Automated Scraping Pipeline:** Custom website scraping and sitemap extraction to ingest the latest content.
+- **Retrieval-Augmented Generation (RAG):** Context-aware, accurate, and hallucination-free AI responses.
+- **High-Performance Backend:** Built on FastAPI for rapid and efficient API endpoints.
+- **Similarity Search:** Powered by ChromaDB for lightning-fast vector retrieval.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Tools |
+|---|---|
+| **Backend** | Python, FastAPI, Uvicorn |
+| **AI / LLM** | LangChain, Groq API, HuggingFace |
+| **Vector Database** | ChromaDB |
+| **Data Scraping** | BeautifulSoup, Custom Python Scripts |
+| **Frontend** | HTML, CSS, JavaScript |
+
+---
+
+## ⚙️ How It Works
+
+1. **Data Ingestion:** The scraper fetches pages from a provided website sitemap.
+2. **Vectorization:** The text is processed, split into manageable chunks, converted into embeddings, and stored locally in ChromaDB.
+3. **User Query:** The user enters a question into the web-based chat interface.
+4. **Information Retrieval:** The backend converts the user's query into an embedding and retrieves the most relevant semantic chunks from the vector database.
+5. **LLM Generation:** The retrieved data chunks are combined with the original query and passed to the Groq LLM as context.
+6. **Response:** The chatbot returns a highly accurate, context-aware response to the user.
+
+---
+
+## 📂 Repository Structure
+
+```text
 website-rag-chatbot/
 ├── chatbot/
-│   ├── main.py
-│   ├── requirements.txt
-│   ├── .env
+│   ├── main.py                 # FastAPI backend entry point
+│   ├── requirements.txt        # Chatbot-specific dependencies
+│   ├── .env                    # Environment variables (create this)
 │   ├── static/
-│   │   ├── script.js
-│   │   └── style.css
+│   │   ├── script.js           # Frontend logic
+│   │   └── style.css           # Frontend styling
 │   └── templates/
-│       └── index.html
+│       └── index.html          # Chat interface structure
 ├── scraper/
-│   ├── scraper.py
-│   ├── run_scraper.py
-│   └── dataProcessing.py
-├── website_db/
+│   ├── scraper.py              # Core scraping logic
+│   ├── run_scraper.py          # Script to execute the scraping pipeline
+│   └── dataProcessing.py       # Text cleaning and chunking utilities
+├── website_db/                 # ChromaDB local storage (generated)
 ├── .gitignore
 ├── README.md
-└── requirements.txt
+└── requirements.txt            # Global project dependencies
+```
 
+---
 
-Installation and Setup
-Clone the repository
-git clone <repository-url>
+## 💻 Installation & Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone <https://github.com/Ananyanarayanan856/website-rag-chatbot.git >
 cd website-rag-chatbot
-Create a virtual environment
+```
+
+### 2. Create a Virtual Environment
+
+```bash
 python -m venv venv
-venv\Scripts\activate
+```
 
-For Linux or macOS
+Activate the environment:
 
-source venv/bin/activate
-Install dependencies 
+- **Windows:**
+  ```bash
+  venv\Scripts\activate
+  ```
+- **Linux / macOS:**
+  ```bash
+  source venv/bin/activate
+  ```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
-Environment Variables
-Create a .env file in the root directory (or inside the chatbot/ folder if specified) with the following keys:
+```
 
+### 4. Configure Environment Variables
+
+Create a `.env` file in the root directory and add your API keys:
+
+```env
 HF_TOKEN=your_huggingface_token
 GROQ_API_KEY=your_groq_api_key
+```
 
+---
 
-Run the Project
-Run the Scraper (Optional, if you need to ingest new data)
+## ▶️ Running the Project
+
+### Step 1: Run the Scraper
+
+> Optional — only required on the first run or when ingesting new website data.
+
+```bash
 cd scraper
 python run_scraper.py
-Start the FastAPI Server
+```
+
+### Step 2: Start the FastAPI Server
+
+Open a new terminal (with the virtual environment active) and run:
+
+```bash
 cd chatbot
 uvicorn main:app --reload
-Open the Web Interface
-Navigate your browser to: http://localhost:8000
+```
 
+### Step 3: Open the Web Interface
 
-How It Works
-1 Data Ingestion
-   The scraper fetches pages from a website sitemap.
-2 Vectorization
-   Text is processed, split into chunks, converted into embeddings, and stored in ChromaDB.
-3 User Query
-   User enters a query in the chat interface.
-4 Information Retrieval
-   Backend converts the query into an embedding and retrieves relevant chunks from the vector database.
-5 LLM Generation
-   Retrieved data is combined with the query and sent to the Groq LLM.
-6 Response
-   The chatbot returns a context-aware response to the user.
+Navigate to [http://localhost:8000](http://localhost:8000) in your browser to start chatting!
