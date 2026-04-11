@@ -11,3 +11,6 @@ __pycache__/
 
 #chroma db
 website_db/
+
+#scraped data and the sitemap urls
+scraper/*.json
