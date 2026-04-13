@@ -3,12 +3,17 @@ import json
 import sys
 
 # Ensure the working directory is strictly this folder so paths don't glitch
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+current_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(current_dir)
+
+# Add the chatbot directory to Python's path
+chatbot_dir = os.path.abspath(os.path.join(current_dir, "..", "chatbot"))
+sys.path.append(chatbot_dir)
 
 # Import local modules
 from sitemap_extractor import extract_urls
 import scraper  
-from dataProcessing import process_scraped_data
+from dataProcessing import process_scraped_data 
 
 def main():
     print("=== Website RAG Chatbot Scraper Pipeline ===")
@@ -36,21 +41,28 @@ def main():
 
     # Step 2: Scrape the pages
     print("\n--- Step 2: Scraping Pages ---")
-    scraper.main()  # This uses sitemap_urls.json and writes to scraped_data.json
+    scraper.main()  # This uses sitemap_urls.json and writes to data.json
 
     # Step 3: Process the data into the Chromadb vector database
     print("\n--- Step 3: Processing Data into Vector Database ---")
-    # Point the database to the chatbot folder where it belongs
-    db_path = os.path.join("..", "chatbot", "website_db")
-    scraped_file = "scraped_data.json"
+    
+    data_folder_path = os.path.join("..", "chatbot", "data")
+    db_path = os.path.join(data_folder_path, "website_db")
+    
+    # Ensure the 'data' folder actually exists before we try to save inside it
+    os.makedirs(data_folder_path, exist_ok=True)
+    # --------------------------------------------------------------
+    
+    scraped_file = "data.json" 
     
     if not os.path.exists(scraped_file):
         print(f"[ERROR] {scraped_file} not found. Scraping might have failed.")
         return
         
     process_scraped_data(scraped_file, db_directory=db_path)
+    
     print("\n=== Pipeline Complete! ===")
-    print(f"The vector database has been saved to: {db_path}")
+    print(f"The vector database has been saved to: {os.path.abspath(db_path)}")
     print("You can now run 'python main.py' from the chatbot folder to start the AI server.")
 
 if __name__ == "__main__":

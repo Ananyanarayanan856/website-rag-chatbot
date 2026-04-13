@@ -13,9 +13,11 @@ if not hf_token:
 if not groq_api_key:
     raise ValueError("GROQ_API_KEY not found!")
 
-DB_DIRECTORY = "./website_db"
 
-print("Loading Database and Embeddings...")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+DB_DIRECTORY = os.path.join(current_dir, "data", "website_db")
+
+print(f"Loading Database from {DB_DIRECTORY} and Embeddings...")
 embedding = HuggingFaceEndpointEmbeddings(
     model="sentence-transformers/all-MiniLM-L6-v2",
     huggingfacehub_api_token=hf_token
