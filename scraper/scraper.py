@@ -8,6 +8,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, WebDriverException
 
+# --- Configuration ---
+INPUT_FILE  = "sitemap_urls.json"
+OUTPUT_FILE = "data.json"
+DELAY       = 2
 
 def get_driver():
     options = Options()
@@ -23,7 +27,6 @@ def get_driver():
     )
     driver = webdriver.Chrome(options=options)
     return driver
-
 
 def scrape_page(driver, url, timeout=20):
     try:
@@ -105,12 +108,7 @@ def scrape_page(driver, url, timeout=20):
     except Exception as e:
         return {"url": url, "status": "error", "error": str(e)}
 
-
 def main():
-    INPUT_FILE  = "sitemap_urls.json"
-    OUTPUT_FILE = "scraped_data.json"
-    DELAY       = 2
-
     if not os.path.exists(INPUT_FILE):
         print(f"[ERROR] {INPUT_FILE} not found.")
         return
@@ -153,6 +151,7 @@ def main():
             else:
                 print(f"  ✗  {data['status']}: {data.get('error','')[:80]}")
 
+            # Save progress incrementally to data.json
             with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
                 json.dump(results, f, indent=2, ensure_ascii=False)
 
@@ -161,8 +160,7 @@ def main():
     finally:
         driver.quit()
 
-    print(f"\n✅  Done! {len(results)} pages saved to {OUTPUT_FILE}")
-
+    print(f"\n  Done! {len(results)} pages saved to {OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
