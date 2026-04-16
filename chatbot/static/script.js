@@ -2,7 +2,19 @@ const chatWindow = document.getElementById('chat-window');
 const chatInput = document.getElementById('chat-input');
 const loader = document.getElementById('loader');
 
+// Keep track of the globally playing audio
+let currentAudio = null;
+
 async function sendMessage() {
+    // If audio is currently playing, force stop it immediately!
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+    
+    // Create a new audio object synchronously during the user gesture to bypass browser autoplay restrictions
+    currentAudio = new Audio();
+    
     const text = chatInput.value.trim();
     if (!text) return;
 
@@ -32,6 +44,11 @@ async function sendMessage() {
             appendMessage("Error: " + data.error, 'bot-msg');
         } else {
             appendMessage(data.answer, 'bot-msg');
+            
+            if (data.audio) {
+                currentAudio.src = "data:audio/wav;base64," + data.audio;
+                currentAudio.play().catch(e => console.error("Audio playback failed:", e));
+            }
         }
 
     } catch (error) {
