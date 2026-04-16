@@ -4,14 +4,14 @@ const chatInput = document.getElementById('chat-input');
 
 const loader = document.getElementById('loader');
 
-const micBtn = document.getElementById('mic-btn'); // NEW
+const micBtn = document.getElementById('mic-btn'); 
 
 
-let mediaRecorder; // NEW
+let mediaRecorder; 
 
-let audioChunks = []; // NEW
+let audioChunks = []; 
 
-let isRecording = false; // NEW
+let isRecording = false; 
 
 
 // EXISTING: sendMessage function
@@ -190,14 +190,12 @@ async function transcribeAudio(audioBlob) {
 
 const formData = new FormData();
 
-// Your FastAPI expects the parameter to be named 'audio'
 
 formData.append("audio", audioBlob, "recording.webm");
 
 
 try {
 
-// IMPORTANT: Ensure your STT FastAPI server is running on this URL/Port
 
 const response = await fetch('/transcribe-chunk', {
 
@@ -211,7 +209,6 @@ const data = await response.json();
 
 if (data.text && data.text !== "No speech detected.") {
 
-// Append transcribed text to whatever is already in the input box
 
 const currentText = chatInput.value;
 
