@@ -12,6 +12,22 @@ import base64
 # No need to add parent directory as text_to_speech is now local
 from chatbot import chat
 from text_to_speech import generate_speech
+from urllib.parse import urlparse
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
+
+def get_company_name():
+    website_url = os.environ.get("WEBSITE_URL", "")
+    if not website_url:
+        return "Website"
+    
+    parsed_url = urlparse(website_url)
+    domain = parsed_url.netloc or parsed_url.path
+    if domain.startswith("www."):
+        domain = domain[4:]
+    
+    company_name = domain.split('.')[0]
+    return company_name.capitalize()
 
 app = FastAPI(title="AI Website Chatbot API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -25,8 +41,8 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 async def home(request: Request):
- 
-    return templates.TemplateResponse(request=request, name="index.html")
+    company_name = get_company_name()
+    return templates.TemplateResponse(request=request, name="index.html", context={"company_name": company_name})
 
 @app.post("/chat")
 async def chat_endpoint(request_data: ChatRequest):
