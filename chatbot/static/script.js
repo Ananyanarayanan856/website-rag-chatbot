@@ -43,12 +43,7 @@ async function sendMessage() {
         if(data.error) {
             appendMessage("Error: " + data.error, 'bot-msg');
         } else {
-            appendMessage(data.answer, 'bot-msg');
-            
-            if (data.audio) {
-                currentAudio.src = "data:audio/wav;base64," + data.audio;
-                currentAudio.play().catch(e => console.error("Audio playback failed:", e));
-            }
+            appendMessage(data.answer, 'bot-msg', data.audio);
         }
 
     } catch (error) {
@@ -57,10 +52,38 @@ async function sendMessage() {
     }
 }
 
-function appendMessage(text, className) {
+function appendMessage(text, className, audioBase64 = null) {
     const div = document.createElement('div');
     div.className = `message-bubble ${className}`;
-    div.innerText = text;
+    
+    // Add text content
+    const textSpan = document.createElement('span');
+    textSpan.className = 'message-text';
+    textSpan.innerText = text;
+    div.appendChild(textSpan);
+    
+    // Create actions bar if audio exists
+    if (audioBase64) {
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'message-actions';
+        
+        const audioBtn = document.createElement('button');
+        audioBtn.className = 'play-audio-btn';
+        audioBtn.title = 'Listen to response';
+        audioBtn.innerHTML = '🔊';
+        audioBtn.onclick = () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentAudio = new Audio("data:audio/wav;base64," + audioBase64);
+            currentAudio.play().catch(e => console.error("Playback failed:", e));
+        };
+        
+        actionsDiv.appendChild(audioBtn);
+        div.appendChild(actionsDiv);
+    }
+    
     chatWindow.appendChild(div);
     // Re-append loader to ensure it stays at the bottom during activity
     if (loader.classList.contains('active')) {
