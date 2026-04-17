@@ -97,9 +97,12 @@ Activate the environment:
 
 ### 3. Install Dependencies
 
+Run the following command to automatically prepare your environment:
+
 ```bash
-pip install -r requirements.txt
+make setup
 ```
+> **Note:** Note: This command installs the required Python packages and pre-downloads the necessary AI models: `Faster-Whisper` (for speech-to-text) and `Piper TTS` (for text-to-speech). Once completed, the models will be cached locally for offline use.
 
 ### 4. Configure Environment Variables
 
@@ -109,19 +112,6 @@ Create a `.env` file in the root directory (or inside the `chatbot/` folder) and
 HF_TOKEN=your_huggingface_token
 GROQ_API_KEY=your_groq_api_key
 ```
-
-### 5. Download TTS Voice Models
-
-Before running the server or the app, you need to download the Piper text-to-speech AI models from Hugging Face.
-
-To download the required files, simply run the setup script from the root of your project:
-
-```bash
-python setup_models.py
-```
-
-> **Note:** This script automatically fetches the `.onnx` and `.json` model files and securely places them in the `chatbot/text_to_speech/models/` folder.
-
 ---
 
 ## ▶️ Running the Project
