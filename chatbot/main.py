@@ -1,18 +1,16 @@
 import os
 import uvicorn
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import sys
-import os
 import base64
-
-# No need to add parent directory as text_to_speech is now local
+from urllib.parse import urlparse
 from chatbot import chat
 from text_to_speech import generate_speech
-from urllib.parse import urlparse
+from speech_to_text.stt_handler import process_audio_chunk
 
 load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
 
@@ -32,9 +30,7 @@ def get_company_name():
 app = FastAPI(title="AI Website Chatbot API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
 templates = Jinja2Templates(directory="templates")
-
 
 class ChatRequest(BaseModel):
     query: str
@@ -64,7 +60,17 @@ async def chat_endpoint(request_data: ChatRequest):
     return {"answer": answer, "audio": audio_base64}
 
 
+#Speech-to-Text Endpoint
+@app.post("/transcribe-chunk")
+async def transcribe_chunk(audio: UploadFile = File(...)):
+    # Read the audio bytes directly from the request
+    file_bytes = await audio.read()
+    
+    # Pass the bytes to the STT handler for processing
+    transcribed_text = await process_audio_chunk(file_bytes)
+    
+    return {"text": transcribed_text}
+
 if __name__ == "__main__":
     print("Starting FastAPI server...")
-    # Triggering reload
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)

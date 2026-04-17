@@ -135,6 +135,45 @@ body {
 
 .input-container input::placeholder { color: var(--text-muted); }
 
+/* --- NEW MIC BUTTON STYLES --- */
+.mic-btn {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.mic-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.mic-btn svg { 
+    width: 20px; 
+    height: 20px; 
+    fill: currentColor; 
+}
+
+/* Recording State Styles */
+.mic-btn.recording {
+    color: #ef4444;
+    animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* --- SEND BUTTON STYLES --- */
 .send-btn {
     background: var(--primary);
     color: white;
@@ -158,6 +197,7 @@ body {
 .send-btn:active { transform: scale(0.95); }
 .send-btn svg { width: 18px; height: 18px; fill: currentColor; margin-left: 2px; }
 
+/* --- TYPING INDICATOR STYLES --- */
 .typing-container { align-self: flex-start; display: none; }
 .typing-container.active { display: block; }
 .typing-indicator {
