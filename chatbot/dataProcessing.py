@@ -73,4 +73,7 @@ def process_scraped_data(json_file_path, db_directory="./website_db"):
     print(f"Success! Vector database saved locally at: {db_directory}")
 
 if __name__ == "__main__":
-    process_scraped_data('scraped_data.json')
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    json_path = os.path.join(os.path.dirname(current_dir), "scraper", "data.json")
+    db_path = os.path.join(current_dir, "data", "website_db")
+    process_scraped_data(json_path, db_directory=db_path)

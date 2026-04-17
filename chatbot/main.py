@@ -9,11 +9,7 @@ import sys
 import os
 import base64
 
-# Add the parent directory to sys.path so we can import text_to_speech
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if parent_dir not in sys.path:
-    sys.path.append(parent_dir)
-
+# No need to add parent directory as text_to_speech is now local
 from chatbot import chat
 from text_to_speech import generate_speech
 
