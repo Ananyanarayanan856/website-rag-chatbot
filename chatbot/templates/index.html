@@ -12,11 +12,11 @@
     <div class="main-chat">
         <div class="chat-header">
             <div class="status-dot"></div>
-            Website Assistant AI
+            {{ company_name }} Assistant
         </div>
 
         <div class="chat-window" id="chat-window">
-            <div class="message-bubble bot-msg">Hello! I'm your AI RAG assistant. I've ingested your website's data and am ready to answer any questions about the content. What would you like to know?</div>
+            <div class="message-bubble bot-msg">Hi, I'm your {{ company_name }} assistant and I'm ready to answer your questions.</div>
         </div>
 
         <div class="typing-container" id="loader">
@@ -45,6 +45,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', path='script.js') }}"></script>
+    <script src="{{ url_for('static', path='script.js') }}?v=5"></script>
 </body>
 </html>

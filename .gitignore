@@ -14,3 +14,8 @@ website_db/
 
 #scraped data and the sitemap urls
 scraper/*.json
+
+# TTS Models
+chatbot/text_to_speech/models/
+*.onnx
+*.onnx.json

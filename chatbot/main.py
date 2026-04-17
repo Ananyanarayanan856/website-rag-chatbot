@@ -5,8 +5,27 @@ from fastapi import FastAPI, Request, HTTPException, File, UploadFile
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+import sys
+import base64
+from urllib.parse import urlparse
 from chatbot import chat
+from text_to_speech import generate_speech
 from speech_to_text.stt_handler import process_audio_chunk
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '../.env'))
+
+def get_company_name():
+    website_url = os.environ.get("WEBSITE_URL", "")
+    if not website_url:
+        return "Website"
+    
+    parsed_url = urlparse(website_url)
+    domain = parsed_url.netloc or parsed_url.path
+    if domain.startswith("www."):
+        domain = domain[4:]
+    
+    company_name = domain.split('.')[0]
+    return company_name.capitalize()
 
 app = FastAPI(title="AI Website Chatbot API")
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -18,7 +37,8 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse(request=request, name="index.html")
+    company_name = get_company_name()
+    return templates.TemplateResponse(request=request, name="index.html", context={"company_name": company_name})
 
 @app.post("/chat")
 async def chat_endpoint(request_data: ChatRequest):
@@ -29,7 +49,16 @@ async def chat_endpoint(request_data: ChatRequest):
 
     answer = chat(user_query)
     
-    return {"answer": answer}
+    # Generate speech
+    audio_base64 = None
+    try:
+        audio_bytes = generate_speech(answer)
+        audio_base64 = base64.b64encode(audio_bytes).decode("utf-8")
+    except Exception as e:
+        print(f"TTS Error: {e}")
+    
+    return {"answer": answer, "audio": audio_base64}
+
 
 #Speech-to-Text Endpoint
 @app.post("/transcribe-chunk")
