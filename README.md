@@ -41,53 +41,6 @@ The Website RAG Chatbot prevents large language model (LLM) hallucinations by gr
 5. **LLM Generation:** The retrieved data chunks are combined with the original query and passed to the Groq LLM as context.
 6. **Response:** The chatbot returns a highly accurate, context-aware response to the user.
 
----
-
-# 🤖 Website RAG Chatbot
-
-> A production-ready AI chatbot designed to interact with users using context retrieved directly from a website's content.
-
-## 📖 Overview
-
-The Website RAG Chatbot prevents large language model (LLM) hallucinations by grounding responses via accurate web scraping and vector search. By utilizing a dedicated scraping pipeline and a local vector database, it ensures users receive trustworthy, domain-specific information directly from the source.
-
-**Key Idea:** A Retrieval-Augmented Generation (RAG) chatbot utilizing a dedicated data ingestion pipeline and a robust local vector database.
-
----
-
-## ✨ Features
-
-- **Clean Web Interface:** A responsive and intuitive chat interface for seamless user interaction.
-- **Automated Scraping Pipeline:** Custom website scraping and sitemap extraction to ingest the latest content.
-- **Retrieval-Augmented Generation (RAG):** Context-aware, accurate, and hallucination-free AI responses.
-- **High-Performance Backend:** Built on FastAPI for rapid and efficient API endpoints.
-- **Similarity Search:** Powered by ChromaDB for lightning-fast vector retrieval.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Tools |
-|---|---|
-| **Backend** | Python, FastAPI, Uvicorn |
-| **AI / LLM** | LangChain, Groq API, HuggingFace |
-| **Vector Database** | ChromaDB |
-| **Data Scraping** | BeautifulSoup, Selenium, Custom Python Scripts |
-| **Frontend** | HTML, CSS, JavaScript |
-
----
-
-## ⚙️ How It Works
-
-1. **Data Ingestion:** The scraper extracts URLs from a provided website sitemap and fetches the page contents.
-2. **Vectorization:** The text is processed, split into manageable chunks, converted into embeddings, and stored locally in ChromaDB inside the chatbot's data folder.
-3. **User Query:** The user enters a question into the web-based chat interface.
-4. **Information Retrieval:** The backend converts the user's query into an embedding and retrieves the most relevant semantic chunks from the vector database.
-5. **LLM Generation:** The retrieved data chunks are combined with the original query and passed to the Groq LLM as context.
-6. **Response:** The chatbot returns a highly accurate, context-aware response to the user.
-
----
-
 ## 📂 Repository Structure
 
 ```text
@@ -110,7 +63,8 @@ website-rag-chatbot/
 │   └── run_scraper.py          # Script to execute the full scraping & embedding pipeline
 ├── .gitignore
 ├── README.md
-└── requirements.txt            # Global project dependencies
+├── requirements.txt            # Global project dependencies
+└── setup_models.py             # Script to download TTS models
 ```
 
 ---
@@ -155,6 +109,18 @@ Create a `.env` file in the root directory (or inside the `chatbot/` folder) and
 HF_TOKEN=your_huggingface_token
 GROQ_API_KEY=your_groq_api_key
 ```
+
+### 5. Download TTS Voice Models
+
+Before running the server or the app, you need to download the Piper text-to-speech AI models from Hugging Face.
+
+To download the required files, simply run the setup script from the root of your project:
+
+```bash
+python setup_models.py
+```
+
+> **Note:** This script automatically fetches the `.onnx` and `.json` model files and securely places them in the `chatbot/text_to_speech/models/` folder.
 
 ---
 
